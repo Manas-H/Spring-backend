@@ -1,5 +1,6 @@
 package com.example.courseapi.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,8 +13,13 @@ public class Course {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length = 100)
     private String title;
+
+    @Column(length = 10, unique = true)
     private String code;
+
+    @Column(length = 1000)
     private String description;
 
     // Getters and Setters

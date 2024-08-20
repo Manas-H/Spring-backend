@@ -10,8 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
+
 @RestController
 @RequestMapping("/api/courses")
+@CrossOrigin(origins = "http://localhost:3000")
 public class CourseController {
 
     @Autowired
@@ -20,12 +23,16 @@ public class CourseController {
     @PostMapping
     @Transactional
     public ResponseEntity<Course> createCourse(@RequestBody Course course) {
-        System.out.println("Received course: " + course);
-        Course createdCourse = courseRepository.save(course);
-        System.out.println("Saved course: " + createdCourse);
-        return new ResponseEntity<>(createdCourse, HttpStatus.CREATED);
+        try {
+            System.out.println("Received course: " + course);
+            Course createdCourse = courseRepository.save(course);
+            System.out.println("Saved course: " + createdCourse);
+            return new ResponseEntity<>(createdCourse, HttpStatus.CREATED);
+        } catch (Exception e) {
+            e.printStackTrace(); // Log the exception
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
-       
 
     @GetMapping
     public List<Course> getAllCourses() {
@@ -35,8 +42,8 @@ public class CourseController {
     @GetMapping("/{id}")
     public ResponseEntity<Course> getCourseById(@PathVariable Long id) {
         return courseRepository.findById(id)
-            .map(course -> new ResponseEntity<>(course, HttpStatus.OK))
-            .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+                .map(course -> new ResponseEntity<>(course, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @DeleteMapping("/{id}")

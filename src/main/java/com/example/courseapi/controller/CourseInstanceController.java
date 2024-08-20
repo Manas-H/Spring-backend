@@ -11,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/instances")
+@CrossOrigin(origins = "http://localhost:3000")
 public class CourseInstanceController {
 
     @Autowired
@@ -18,8 +19,13 @@ public class CourseInstanceController {
 
     @PostMapping
     public ResponseEntity<CourseInstance> createInstance(@RequestBody CourseInstance instance) {
-        CourseInstance createdInstance = courseInstanceRepository.save(instance);
-        return new ResponseEntity<>(createdInstance, HttpStatus.CREATED);
+        try {
+            CourseInstance createdInstance = courseInstanceRepository.save(instance);
+            return new ResponseEntity<>(createdInstance, HttpStatus.CREATED);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/{year}/{semester}")
@@ -29,17 +35,17 @@ public class CourseInstanceController {
 
     @GetMapping("/{year}/{semester}/{id}")
     public ResponseEntity<CourseInstance> getInstanceById(@PathVariable int year,
-                                                           @PathVariable int semester,
-                                                           @PathVariable Long id) {
+            @PathVariable int semester,
+            @PathVariable Long id) {
         return courseInstanceRepository.findById(id)
-            .map(instance -> new ResponseEntity<>(instance, HttpStatus.OK))
-            .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+                .map(instance -> new ResponseEntity<>(instance, HttpStatus.OK))
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @DeleteMapping("/{year}/{semester}/{id}")
     public ResponseEntity<Void> deleteInstance(@PathVariable int year,
-                                               @PathVariable int semester,
-                                               @PathVariable Long id) {
+            @PathVariable int semester,
+            @PathVariable Long id) {
         if (courseInstanceRepository.existsById(id)) {
             courseInstanceRepository.deleteById(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
